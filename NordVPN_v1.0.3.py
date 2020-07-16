@@ -4,8 +4,8 @@
 from tkinter import *
 from tkinter import messagebox
 from functools import partial
-#import os
-#import time
+import os
+import time
 import datetime
 
 # Initial variables - Start
@@ -16,6 +16,7 @@ programTitle = "NordVPN Controller"
 programVersion = "Version 1.0.0" # New GUI layout
 programVersion = "Version 1.0.1" # Added Menu
 programVersion = "Version 1.0.2" # Changes to about and exit boxes
+programVersion = "Version 1.0.3" # Login section. Needs status message boxes
 programmerName = " David Brown (rpitns@gmail.com)"
 if timeNow.year > writeYear:
     programAuthor = "©" + str(writeYear) + "-" + str(timeNow.year) + programmerName
@@ -23,6 +24,7 @@ else:
     programAuthor = "©" + str(writeYear) + programmerName
 aboutMessage = programTitle + lineFeed + programVersion + lineFeed + programAuthor
 print(aboutMessage) #Debug
+#userName = ""
 # Initial variables - End
 
 # Main class - Start
@@ -63,6 +65,8 @@ class Window(Frame):
         #file.add_command(label="Logout")
         fileMainMenu = Menu(menu, tearoff=0) #Create the File menu container
         fileMainMenu.add_command(label="Login", command=self.vpnLogin)
+        fileMainMenu.add_command(label="Logout", command=self.vpnLogout)
+        fileMainMenu.add_separator()
         fileMainMenu.add_command(label="Exit", command=self.programExit) # File menu option
         menu.add_cascade(label="File", menu=fileMainMenu)
         
@@ -74,13 +78,56 @@ class Window(Frame):
 
     # Menu commands - Start
     def vpnLogin(self):
-        print("Login")
+        global loginFrame
+        global userName
+        global passWord
+        global usernameEntry
+        global passwordEntry
+        # create the frame with a message and two buttons
+        # which destroys the window
+        loginFrame = Frame(self.master, bd=10, relief="groove")
+        label1 = Label(loginFrame, text="Account Login\n\n", font=("Helvetica", 16, "bold italic"))
+        label2 = Label(loginFrame, text="Username:", font=("Helvetica", 14))
+        label3 = Label(loginFrame, text="Password:", font=("Helvetica", 14))
+        label1.grid(row=1, columnspan=3, padx=20, pady=20)
+        label2.grid(row=2, column=1, padx=20, pady=20)
+        label3.grid(row=3, column=1, padx=20, pady=20)
+        userName = StringVar()
+        passWord = StringVar()
+        usernameEntry = Entry(loginFrame, textvariable=userName).grid(row=2, column=2)
+        passwordEntry = Entry(loginFrame, textvariable=passWord, show= '*').grid(row=3, column=2)
+        loginButton1 = Button(loginFrame, text="Cancel", command=loginFrame.destroy)
+        loginButton1.grid(row=4,column=2)
+        #loginButton2 = Button(loginFrame, text="Login", command=self.loginCommand(userName,passWord))
+        loginButton2 = Button(loginFrame, text="Login", command=self.loginCommand)
+        # button2.pack(side="left", pady=20)
+        loginButton2.grid(row=4,column=1)
 
+        # overlay the "login" page on top of the root window
+        loginFrame.place(relx=.5, rely=.5, anchor="c")
+        #aboutFrame.place(x=0, y=0, anchor="nw", relwidth=1.0, relheight=1.0) #If you want to completely hide the contents of the main window, you can change the place arguments to fill the window
+        # force all events to go to the popup
+        loginFrame.grab_set()
+        
+    def vpnLogout(self):
+        global logoutFrame
+        logoutFrame = Frame(self.master, bd=10, relief="groove")
+        logoutLabel1 = Label(logoutFrame, text="Logout\n\n", font=("Helvetica", 16, "bold italic"))
+        logoutLabel2 = Label(logoutFrame, text="Are you sure you want to logout of {}?".format(programTitle), font=("Helvetica", 14))
+        logoutLabel1.grid(row=1, columnspan=2, padx=20, pady=20)
+        logoutLabel2.grid(row=2, columnspan=2, padx=20, pady=20)
+        logoutButton1 = Button(logoutFrame, text="No", command=logoutFrame.destroy)
+        logoutButton1.grid(row=3,column=0)
+        logoutButton2 = Button(logoutFrame, text="Yes", command=self.logoutCommand)
+        logoutButton2.grid(row=3,column=1)
+        logoutFrame.place(relx=.5, rely=.5, anchor="c")
+        logoutFrame.grab_set()
+        
     def programExit(self):
         # create the frame with a message and two buttons
         # which destroys the window
         exitFrame = Frame(self.master, bd=10, relief="groove")
-        label1 = Label(exitFrame, text="Exit Application\n\n", font=("Helvetica", 16, "bold italic"))
+        label1 = Label(exitFrame, text="Exit Application", font=("Helvetica", 16, "bold italic"))
         label2 = Label(exitFrame, text="Are you sure you want to exit {}?".format(programTitle), font=("Helvetica", 14))
         
         #label1.pack(side="top", padx=20, pady=20)
@@ -104,7 +151,7 @@ class Window(Frame):
         # create the frame with a message and a button
         # which destroys the window
         aboutFrame = Frame(self.master, bd=10, relief="groove")
-        label1 = Label(aboutFrame, text="About the application...\n\n", font=("Helvetica", 16, "bold italic"))
+        label1 = Label(aboutFrame, text="About the application...", font=("Helvetica", 16, "bold italic"))
         label2 = Label(aboutFrame, text="{}".format(aboutMessage), font=("Helvetica", 14))
         button = Button(aboutFrame, text="Ok", command=aboutFrame.destroy)
         label1.pack(side="top", padx=20, pady=20)
@@ -116,6 +163,73 @@ class Window(Frame):
         #aboutFrame.place(x=0, y=0, anchor="nw", relwidth=1.0, relheight=1.0) #If you want to completely hide the contents of the main window, you can change the place arguments to fill the window
         # force all events to go to the popup
         aboutFrame.grab_set()
+    def programStatus(self):
+        global status
+        global statusFrame
+        status = statusMessage
+        # create the frame with a message and a button
+        # which destroys the window
+        statusFrame = Frame(self.master, bd=10, relief="groove")
+        statusLabel1 = Label(statusFrame, text="Status...", font=("Helvetica", 16, "bold italic"))
+        statusLabel2 = Label(statusFrame, text="{}".format(status), font=("Helvetica", 14))
+        statusButton = Button(statusFrame, text="Ok", command=self.statusExit)
+        statusLabel1.pack(side="top", padx=20, pady=20)
+        statusLabel2.pack(side="top", padx=20, pady=20)
+        statusButton.pack(side="bottom", pady=20)
+
+        # overlay the "about" page on top of the root window
+        statusFrame.place(relx=.5, rely=.5, anchor="c")
+        #aboutFrame.place(x=0, y=0, anchor="nw", relwidth=1.0, relheight=1.0) #If you want to completely hide the contents of the main window, you can change the place arguments to fill the window
+        # force all events to go to the popup
+        statusFrame.grab_set()
+    def statusExit(self):
+        statusFrame.destroy()
+        if status == "Username or password is not correct. Please try again.":
+            self.vpnLogin()
+    def loginCommand(self):
+        global statusMessage
+        #print("Login command reached")
+        #print(userName)
+        #print("Login Command Username: {}".format(userName))
+        userName1 = userName.get()
+        passWord1 = passWord.get()
+        #print("After Get - Username: {}".format(username1))
+        #print("After Get - Password: {}".format(password1))
+        #print("nordvpn login -u {} -p {}".format(userName1, passWord1))
+        loginFrame.destroy()
+        o=os.popen("nordvpn login -u {} -p {}".format(userName1, passWord1)).read()
+        #while "Status: Disonnected" in o:
+        #    time.sleep(5)
+        #    o=os.popen('nordvpn status').read()
+        #o = "Welcome to NordVPN! You can now connect to VPN by using 'nordvpn connect'."
+        if "You are already logged in." in o:
+            print("You are already logged in. You can now connect to the VPN")
+            statusMessage = "You are already logged in. You can now connect to the VPN"
+        elif "Welcome to NordVPN!" in o:
+            print("Welcome to NordVPN! You can now connect to the VPN")
+            statusMessage = "Welcome to NordVPN! You can now connect to the VPN"
+        else:
+            print("Username or password is not correct. Please try again.")
+            statusMessage = "Username or password is not correct. Please try again."
+        self.programStatus()
+        #wait_window(statusFrame) 
+        #if statusMessage == "Username or password is not correct. Please try again.":
+        #    self.vpnLogin()
+    def logoutCommand(self):
+        global statusMessage
+        o=os.popen('nordvpn logout').read()
+        logoutFrame.destroy()
+        if "You are logged out" in o:
+            print("You are now logged out.")
+            statusMessage = "You are now logged out."
+        elif "You are not logged in" in o:
+            print ("You are already logged out.")
+            statusMessage = "You are already logged out."
+        else:
+            print("Unknown error")
+            statusMessage = "Unknown error"
+        self.programStatus()
+        
     def exitCommand(self):
         root.destroy()
         exit()
@@ -143,4 +257,3 @@ root.geometry("{}x{}+{}+{}".format(windowWidth, windowHeight, positionRight, pos
 app = Window(root)
 root.mainloop()
 # Main program - End
-
