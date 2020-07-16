@@ -1,20 +1,21 @@
 #! /usr/bin/python3
-
+# Thanks to Bryan Oakley (https://stackoverflow.com/users/7432/bryan-oakley) for the info on frames. See https://stackoverflow.com/a/60195495/12887659
 #from tkinter import Tk, Frame, BOTH, Menu, messagebox, window
 from tkinter import *
 from tkinter import messagebox
-#from functools import partial
+from functools import partial
 #import os
 #import time
 import datetime
 
 # Initial variables - Start
 timeNow = datetime.datetime.now()
-writeYear = 2019 # Enter the year you started writing the program
+writeYear = 2020 # Enter the year you started writing the program
 lineFeed = "\n"
 programTitle = "NordVPN Controller"
 programVersion = "Version 1.0.0" # New GUI layout
 programVersion = "Version 1.0.1" # Added Menu
+programVersion = "Version 1.0.2" # Changes to about and exit boxes
 programmerName = " David Brown (rpitns@gmail.com)"
 if timeNow.year > writeYear:
     programAuthor = "©" + str(writeYear) + "-" + str(timeNow.year) + programmerName
@@ -61,6 +62,7 @@ class Window(Frame):
         #file.add_command(label="Disconnect")
         #file.add_command(label="Logout")
         fileMainMenu = Menu(menu, tearoff=0) #Create the File menu container
+        fileMainMenu.add_command(label="Login", command=self.vpnLogin)
         fileMainMenu.add_command(label="Exit", command=self.programExit) # File menu option
         menu.add_cascade(label="File", menu=fileMainMenu)
         
@@ -68,17 +70,36 @@ class Window(Frame):
         helpMainMenu.add_command(label="About", command=self.aboutProgram)
         menu.add_cascade(label="Help", menu=helpMainMenu)
         # create menu instance - End
-
+        
 
     # Menu commands - Start
+    def vpnLogin(self):
+        print("Login")
+
     def programExit(self):
-        #top_frame = tkinter.Frame(window).pack()
-        # top_frame = Frame(Window).pack()
-        exitMsgBox = messagebox.askquestion ("Exit Application","Are you sure you want to exit the application",icon = "warning")
-        if exitMsgBox == "yes":
-            root.destroy()
-            exit()
-    
+        # create the frame with a message and two buttons
+        # which destroys the window
+        exitFrame = Frame(self.master, bd=10, relief="groove")
+        label1 = Label(exitFrame, text="Exit Application\n\n", font=("Helvetica", 16, "bold italic"))
+        label2 = Label(exitFrame, text="Are you sure you want to exit {}?".format(programTitle), font=("Helvetica", 14))
+        
+        #label1.pack(side="top", padx=20, pady=20)
+        label1.grid(row=1, columnspan=2, padx=20, pady=20)
+        label2.grid(row=2, columnspan=2, padx=20, pady=20)
+        #label2.pack(side="top", padx=20, pady=20)
+        button1 = Button(exitFrame, text="No", command=exitFrame.destroy)
+        # button1.pack(side="left", pady=20)
+        button1.grid(row=3,column=0)
+        button2 = Button(exitFrame, text="Yes", command=self.exitCommand)
+        # button2.pack(side="left", pady=20)
+        button2.grid(row=3,column=1)
+
+        # overlay the "about" page on top of the root window
+        exitFrame.place(relx=.5, rely=.5, anchor="c")
+        #aboutFrame.place(x=0, y=0, anchor="nw", relwidth=1.0, relheight=1.0) #If you want to completely hide the contents of the main window, you can change the place arguments to fill the window
+        # force all events to go to the popup
+        exitFrame.grab_set()
+        
     def aboutProgram(self):
         # create the frame with a message and a button
         # which destroys the window
@@ -95,9 +116,9 @@ class Window(Frame):
         #aboutFrame.place(x=0, y=0, anchor="nw", relwidth=1.0, relheight=1.0) #If you want to completely hide the contents of the main window, you can change the place arguments to fill the window
         # force all events to go to the popup
         aboutFrame.grab_set()
-     def exitCommand(self):
-         root.destroy()
-         exit()
+    def exitCommand(self):
+        root.destroy()
+        exit()
     # Menu commands - End
     
 
@@ -122,3 +143,4 @@ root.geometry("{}x{}+{}+{}".format(windowWidth, windowHeight, positionRight, pos
 app = Window(root)
 root.mainloop()
 # Main program - End
+
