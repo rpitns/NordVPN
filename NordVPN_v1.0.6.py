@@ -19,9 +19,12 @@ programVersion = "Version 1.0.2" # Changes to about and exit boxes
 programVersion = "Version 1.0.3" # Login section. Needs status message boxes
 programVersion = "Version 1.0.4" # Added Status, Needs status messages
 programVersion = "Version 1.0.5" # Start work on Connect & Disconnect
+programVersion = "Version 1.0.6" # 
 programmerName = " David Brown (rpitns@gmail.com)"
 if timeNow.year > writeYear:
     programAuthor = "©" + str(writeYear) + "-" + str(timeNow.year) + programmerName
+elif timeNow.year < writeYear:
+    programAuthor = "©" + str(timeNow.year) + programmerName
 else:
     programAuthor = "©" + str(writeYear) + programmerName
 aboutMessage = programTitle + lineFeed + programVersion + lineFeed + programAuthor
@@ -332,4 +335,5 @@ root.geometry("{}x{}+{}+{}".format(windowWidth, windowHeight, positionRight, pos
 app = Window(root)
 root.mainloop()
 # Main program - End
+
 
