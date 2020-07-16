@@ -17,6 +17,7 @@ programVersion = "Version 1.0.0" # New GUI layout
 programVersion = "Version 1.0.1" # Added Menu
 programVersion = "Version 1.0.2" # Changes to about and exit boxes
 programVersion = "Version 1.0.3" # Login section. Needs status message boxes
+programVersion = "Version 1.0.4" # Added Status, Needs status messages
 programmerName = " David Brown (rpitns@gmail.com)"
 if timeNow.year > writeYear:
     programAuthor = "©" + str(writeYear) + "-" + str(timeNow.year) + programmerName
@@ -64,8 +65,13 @@ class Window(Frame):
         #file.add_command(label="Disconnect")
         #file.add_command(label="Logout")
         fileMainMenu = Menu(menu, tearoff=0) #Create the File menu container
+        fileMainMenu.add_command(label="Status", command=self.vpnStatus)
+        fileMainMenu.add_separator()
         fileMainMenu.add_command(label="Login", command=self.vpnLogin)
         fileMainMenu.add_command(label="Logout", command=self.vpnLogout)
+        fileMainMenu.add_separator()
+        fileMainMenu.add_command(label="Connect", command=self.vpnConnect)
+        fileMainMenu.add_command(label="Disconnect", command=self.vpnDisconnect)
         fileMainMenu.add_separator()
         fileMainMenu.add_command(label="Exit", command=self.programExit) # File menu option
         menu.add_cascade(label="File", menu=fileMainMenu)
@@ -77,6 +83,18 @@ class Window(Frame):
         
 
     # Menu commands - Start
+    def vpnStatus(self):
+        o=os.popen('nordvpn status').read()
+        statusFrame = Frame(self.master, bd=10, relief="groove")
+        statusLabel1 = Label(statusFrame, text="{} Status".format(programTitle), font=("Helvetica", 16, "bold italic"))
+        statusLabel2 = Label(statusFrame, text="{}".format(o), font=("Helvetica", 14))
+        statusLabel1.grid(row=1, columnspan=3, padx=20, pady=20)
+        statusLabel2.grid(row=2, columnspan=3, padx=20, pady=20)
+        statusButton1 = Button(statusFrame, text="Ok", command=statusFrame.destroy)
+        statusButton1.grid(row=4,column=1)
+        statusFrame.place(relx=.5, rely=.5, anchor="c")
+        statusFrame.grab_set()
+        print(o)
     def vpnLogin(self):
         global loginFrame
         global userName
@@ -86,12 +104,12 @@ class Window(Frame):
         # create the frame with a message and two buttons
         # which destroys the window
         loginFrame = Frame(self.master, bd=10, relief="groove")
-        label1 = Label(loginFrame, text="Account Login\n\n", font=("Helvetica", 16, "bold italic"))
-        label2 = Label(loginFrame, text="Username:", font=("Helvetica", 14))
-        label3 = Label(loginFrame, text="Password:", font=("Helvetica", 14))
-        label1.grid(row=1, columnspan=3, padx=20, pady=20)
-        label2.grid(row=2, column=1, padx=20, pady=20)
-        label3.grid(row=3, column=1, padx=20, pady=20)
+        loginLabel1 = Label(loginFrame, text="Account Login\n\n", font=("Helvetica", 16, "bold italic"))
+        loginLabel2 = Label(loginFrame, text="Username:", font=("Helvetica", 14))
+        loginLabel3 = Label(loginFrame, text="Password:", font=("Helvetica", 14))
+        loginLabel1.grid(row=1, columnspan=3, padx=20, pady=20)
+        loginLabel2.grid(row=2, column=1, padx=20, pady=20)
+        loginLabel3.grid(row=3, column=1, padx=20, pady=20)
         userName = StringVar()
         passWord = StringVar()
         usernameEntry = Entry(loginFrame, textvariable=userName).grid(row=2, column=2)
@@ -122,7 +140,13 @@ class Window(Frame):
         logoutButton2.grid(row=3,column=1)
         logoutFrame.place(relx=.5, rely=.5, anchor="c")
         logoutFrame.grab_set()
-        
+
+    def vpnConnect(self):
+        print("Connect")
+
+    def vpnDisconnect(self):
+        print("Disconnect")
+
     def programExit(self):
         # create the frame with a message and two buttons
         # which destroys the window
