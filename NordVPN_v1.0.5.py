@@ -18,6 +18,7 @@ programVersion = "Version 1.0.1" # Added Menu
 programVersion = "Version 1.0.2" # Changes to about and exit boxes
 programVersion = "Version 1.0.3" # Login section. Needs status message boxes
 programVersion = "Version 1.0.4" # Added Status, Needs status messages
+programVersion = "Version 1.0.5" # Start work on Connect & Disconnect
 programmerName = " David Brown (rpitns@gmail.com)"
 if timeNow.year > writeYear:
     programAuthor = "©" + str(writeYear) + "-" + str(timeNow.year) + programmerName
@@ -142,10 +143,36 @@ class Window(Frame):
         logoutFrame.grab_set()
 
     def vpnConnect(self):
-        print("Connect")
+        global connectFrame
+        connectFrame = Frame(self.master, bd=10, relief="groove")
+        connectLabel1 = Label(connectFrame, text="Connect to VPN", font=("Helvetica", 16, "bold italic"))
+        connectLabel2 = Label(connectFrame, text="Are you sure you want to connect to the VPN?", font=("Helvetica", 14))
+        connectLabel1.grid(row=1, columnspan=2, padx=20, pady=20)
+        connectLabel2.grid(row=2, columnspan=2, padx=20, pady=20)
+        connectButton1 = Button(connectFrame, text="No", command=connectFrame.destroy)
+        # button1.pack(side="left", pady=20)
+        connectButton1.grid(row=3,column=0)
+        connectButton2 = Button(connectFrame, text="Yes", command=self.connectCommand)
+        # button2.pack(side="left", pady=20)
+        connectButton2.grid(row=3,column=1)
+        connectFrame.place(relx=.5, rely=.5, anchor="c")
+        connectFrame.grab_set()
 
     def vpnDisconnect(self):
-        print("Disconnect")
+        global disconnectFrame
+        disconnectFrame = Frame(self.master, bd=10, relief="groove")
+        disconnectLabel1 = Label(disconnectFrame, text="Disconnect from VPN", font=("Helvetica", 16, "bold italic"))
+        disconnectLabel2 = Label(disconnectFrame, text="Are you sure you want to disconnect from the VPN?", font=("Helvetica", 14))
+        disconnectLabel1.grid(row=1, columnspan=2, padx=20, pady=20)
+        disconnectLabel2.grid(row=2, columnspan=2, padx=20, pady=20)
+        disconnectButton1 = Button(disconnectFrame, text="No", command=disconnectFrame.destroy)
+        # button1.pack(side="left", pady=20)
+        disconnectButton1.grid(row=3,column=0)
+        disconnectButton2 = Button(disconnectFrame, text="Yes", command=self.disconnectCommand)
+        # button2.pack(side="left", pady=20)
+        disconnectButton2.grid(row=3,column=1)
+        disconnectFrame.place(relx=.5, rely=.5, anchor="c")
+        disconnectFrame.grab_set()
 
     def programExit(self):
         # create the frame with a message and two buttons
@@ -253,6 +280,30 @@ class Window(Frame):
             print("Unknown error")
             statusMessage = "Unknown error"
         self.programStatus()
+
+    def connectCommand(self):
+        global statusMessage
+        connectFrame.destroy()
+        print("Connect")
+        o=os.popen('nordvpn connect').read()
+        #o=os.popen('nordvpn status').read()
+        while "Status: Disconnected" in o:
+            time.sleep(5)
+            o=os.popen('nordvpn status').read()
+        statusMessage = "You are connected to NordVPN"
+        self.programStatus()
+
+    def disconnectCommand(self):
+        global statusMessage
+        disconnectFrame.destroy()
+        print("Disconnect")
+        o=os.popen('nordvpn disconnect').read()
+        # o=os.popen('nordvpn status').read()
+        while "Status: Connected" in o:
+            time.sleep(5)
+            o=os.popen('nordvpn status').read()
+        statusMessage = "You are disconnected from NordVPN"
+        self.programStatus()
         
     def exitCommand(self):
         root.destroy()
@@ -281,3 +332,4 @@ root.geometry("{}x{}+{}+{}".format(windowWidth, windowHeight, positionRight, pos
 app = Window(root)
 root.mainloop()
 # Main program - End
+
