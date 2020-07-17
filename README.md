@@ -11,6 +11,6 @@ A basic python controller for NordVPN
 - Version 1.0.6   Basic working version with about, status, disconnect, connect (quick connect only), logout, login
 
 ## Todo
-- If you are logged out, do not allow to try and conect
+- If you are logged out, do not allow to try and connect
 - Add server list
 - Add version check
